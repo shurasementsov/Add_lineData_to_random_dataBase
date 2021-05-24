@@ -10,17 +10,20 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StartPage {
     private JPanel panelMain;
     private JButton loadPathButton;
-    private JLabel labelPath;
     private JTextArea dmlReport;
     private JTextArea ddlReport;
     private JButton buttonToConnectDataBase;
     private JTextField nameDataBaseField;
     private JLabel statusLabel;
     private JLabel labelDataBaseNameAbout;
+    private Pattern givenData;
+    private Matcher matcher;
 
     private int responseLocation; //положение курсора
     private final String DEFAULT_INPUT_TEXT = "In default will 'public' or input in DDL";
@@ -53,6 +56,7 @@ public class StartPage {
             e.printStackTrace();
             System.out.println("Что-то пошло не так. Смотрите выше.");
         }
+        statusLabel.setText("данные успешно восстановились");
         System.out.println("данные успешно восстановились");
     }
 
@@ -108,7 +112,10 @@ public class StartPage {
 
     public StartPage() {
 
-        nameDataBaseField.addActionListener(new ActionListener() {
+        givenData = Pattern.compile("(?<=CREATE SCHEMA ).*.+?(?=;)");
+        matcher = null;
+
+        buttonToConnectDataBase.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -118,8 +125,7 @@ public class StartPage {
                 responseLocation = file.showOpenDialog(null); //желательно сохранить положение курсора
 
                 //теперь можем работать с файлами
-                labelPath.setText(file.getSelectedFile().getAbsolutePath());
-                String pathQuery = labelPath.getText();
+                String pathQuery = file.getSelectedFile().getAbsolutePath();
                 StringBuilder query = new StringBuilder();
                 String ddlQuery;
                 String dmlQuery;
@@ -135,12 +141,20 @@ public class StartPage {
                 }
                 ddlQuery = ddlParser(query.toString().split("\n"));
                 dmlQuery = dmlParser(query.toString().split("\n"));
-                ddlReport.setText(ddlQuery);
-                dmlReport.setText(dmlQuery);
                 if (nameDataBaseField.getText() == null || nameDataBaseField.getText().equals(DEFAULT_INPUT_TEXT)) {
                     nameDataBaseField.setText("");
                 }
-                dataRecovery(nameDataBaseField.getText(), ddlQuery, dmlQuery);
+                else {
+                    nameDataBaseField.setText(nameDataBaseField.getText().replaceAll("\s+", ""));
+                    matcher = givenData.matcher(ddlQuery);
+                    System.out.println(ddlQuery);
+                    String oldSchemaName = ddlQuery.substring(matcher.start(), matcher.end()).trim();
+                    ddlQuery = ddlQuery.replaceAll(oldSchemaName, nameDataBaseField.getText());
+                    dmlQuery = dmlQuery.replaceAll(oldSchemaName, nameDataBaseField.getText());
+                }
+                ddlReport.setText(ddlQuery);
+                dmlReport.setText(dmlQuery);
+                //dataRecovery(nameDataBaseField.getText(), ddlQuery, dmlQuery);
                 nameDataBaseField.setText(DEFAULT_INPUT_TEXT);
             }
         });
