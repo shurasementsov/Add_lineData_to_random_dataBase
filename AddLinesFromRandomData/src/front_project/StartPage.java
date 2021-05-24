@@ -42,22 +42,34 @@ public class StartPage {
             loadScheme(ddlQuery);
         }
         catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Что-то пошло не так. Смотрите выше.");
+            if (!e.getSQLState().equals("42P06")) {
+                e.printStackTrace();
+                System.out.println("Что-то пошло не так. Смотрите выше.");
+                return;
+            } else {
+                ConnectionLibrary.continueCreatingInserting();
+            }
         }
         try {
             loadData(dmlQuery);
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Что-то пошло не так. Смотрите выше.");
+            if (!e.getSQLState().equals("23505")) {
+                e.printStackTrace();
+                System.out.println("Что-то пошло не так. Смотрите выше.");
+                return;
+            } else {
+                ConnectionLibrary.continueCreatingInserting();
+            }
         }
         try {
             ConnectionLibrary.closeConnection();
         } catch (SQLException troubles) {
             troubles.printStackTrace();
+            return;
         }
         statusLabel.setText("данные успешно восстановились");
         System.out.println("данные успешно восстановились");
+        TableFinder.mainMethod(nameDataBaseField.getText());
     }
 
     private List<String> modifyElements(String[] strings) {
@@ -150,7 +162,6 @@ public class StartPage {
                 ddlReport.setText(ddlQuery);
                 dmlReport.setText(dmlQuery);
                 dataRecovery(nameDataBaseField.getText(), ddlQuery, dmlQuery);
-                nameDataBaseField.setText(DEFAULT_INPUT_TEXT);
             }
         });
         nameDataBaseField.addMouseListener(new MouseAdapter() {

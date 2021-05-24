@@ -37,6 +37,16 @@ public class ConnectionLibrary {
         }
     }
 
+    public static void continueCreatingInserting() {
+        try {
+            stmt.close();
+            c.commit();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     /** create table */
     public static void createTable(String ddlQuery) throws SQLException {
         stmt = c.createStatement();
@@ -69,15 +79,20 @@ public class ConnectionLibrary {
         int columnsCount = rs.getMetaData().getColumnCount();
         String[] header = new String[columnsCount];
         for (int i = 1; i <= columnsCount; i++) {
-            header[i] = rs.getMetaData().getColumnName(i);
+            header[i-1] = rs.getMetaData().getColumnName(i).toString();
         }
 
         List<String[]> content = new ArrayList<>();
         String[] lineResult;
+        lineResult = new String[columnsCount];
+        for (int i = 0; i < columnsCount; i++) {
+            lineResult[i] = "\s".repeat(2) + header[i].toUpperCase() + "\s".repeat(2);
+        }
+        content.add(lineResult);
         while(rs.next()) {
             lineResult = new String[columnsCount];
             for (int i = 1; i <= columnsCount; i++) {
-                lineResult[i] = rs.getString(i);
+                lineResult[i-1] = rs.getString(i);
             }
             content.add(lineResult);
         }
