@@ -75,6 +75,7 @@ public class TableFinder {
         listTables.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent evt) {
+                letsGoInsert.setEnabled(true);
                 if (evt.getValueIsAdjusting()) { // Игнорируем событие mouseDown
                     // Получаем выбранное значение
                     String val = listTables.getSelectedValue().toString();
@@ -98,7 +99,7 @@ public class TableFinder {
         letsGoInsert.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Area4Inserting.mainMethod();
+                Area4Inserting.mainMethod(listTables.getSelectedValue().toString(), schemaName);
             }
         });
     }
