@@ -1,6 +1,7 @@
 package front_project;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +50,11 @@ public class StartPage {
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Что-то пошло не так. Смотрите выше.");
+        }
+        try {
+            ConnectionLibrary.closeConnection();
+        } catch (SQLException troubles) {
+            troubles.printStackTrace();
         }
         statusLabel.setText("данные успешно восстановились");
         System.out.println("данные успешно восстановились");
@@ -91,6 +98,7 @@ public class StartPage {
                 for (int j = i; !sqlDocument[j].contains("\\."); j++) {
                     i = j;
                 }
+                i++;
             } else {
                 result.append(sqlDocument[i]);
                 result.append("\n");
@@ -161,7 +169,8 @@ public class StartPage {
         JFrame mainFrame = new JFrame("StartPage");
         mainFrame.setContentPane(new StartPage().panelMain);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.pack();
+        mainFrame.setLocation(220, 176);
+        mainFrame.setSize(800, 600);
         mainFrame.setVisible(true);
     }
 }

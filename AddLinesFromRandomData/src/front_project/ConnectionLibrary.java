@@ -8,7 +8,7 @@ import java.util.List;
 public class ConnectionLibrary {
 
     private final static boolean DEFAULT_AUTO_COMMIT_OPTION = false;
-    private final static String DEFAULT_CONNECT_REF = "jdbc:postgresql://localhost:5432";
+    private final static String DEFAULT_CONNECT_REF = "jdbc:postgresql://localhost:5432/postgres";
 
     private static Connection c;
     private static Statement stmt;
@@ -40,7 +40,7 @@ public class ConnectionLibrary {
     /** create table */
     public static void createTable(String ddlQuery) throws SQLException {
         stmt = c.createStatement();
-        stmt.executeUpdate(ddlQuery);
+        stmt.execute(ddlQuery);
         stmt.close();
         c.commit();
     }
