@@ -22,8 +22,6 @@ public class StartPage {
     private JTextField nameDataBaseField;
     private JLabel statusLabel;
     private JLabel labelDataBaseNameAbout;
-    private Pattern givenData;
-    private Matcher matcher;
 
     private int responseLocation; //положение курсора
     private final String DEFAULT_INPUT_TEXT = "In default will 'public' or input in DDL";
@@ -37,12 +35,7 @@ public class StartPage {
     }
 
     public void dataRecovery(String schemaName, String ddlQuery, String dmlQuery) {
-        if (schemaName.isBlank()) {
-            ConnectionLibrary.creatConnection();
-        }
-        else{
-            ConnectionLibrary.creatConnection(schemaName);
-        }
+        ConnectionLibrary.creatConnection();
         try {
             loadScheme(ddlQuery);
         }
@@ -86,8 +79,6 @@ public class StartPage {
                 result.append(String.join(", \n", valuesForInsert));
                 result.append(";\n\n");
                 i = j;
-            } else {
-                continue;
             }
         }
         return result.toString();
@@ -97,11 +88,9 @@ public class StartPage {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < sqlDocument.length; i++) {
             if (sqlDocument[i].contains("COPY")) {
-                int j = i;
-                for (; !sqlDocument[j].contains("\\."); j++) {
-                    continue;
+                for (int j = i; !sqlDocument[j].contains("\\."); j++) {
+                    i = j;
                 }
-                i = j;
             } else {
                 result.append(sqlDocument[i]);
                 result.append("\n");
@@ -111,9 +100,6 @@ public class StartPage {
     }
 
     public StartPage() {
-
-        givenData = Pattern.compile("(?<=CREATE SCHEMA ).*.+?(?=;)");
-        matcher = null;
 
         buttonToConnectDataBase.addActionListener(new ActionListener() {
             @Override
@@ -146,15 +132,16 @@ public class StartPage {
                 }
                 else {
                     nameDataBaseField.setText(nameDataBaseField.getText().replaceAll("\s+", ""));
-                    matcher = givenData.matcher(ddlQuery);
                     System.out.println(ddlQuery);
-                    String oldSchemaName = ddlQuery.substring(matcher.start(), matcher.end()).trim();
+                    String oldSchemaName = ddlQuery.substring(ddlQuery.indexOf("CREATE SCHEMA ")).split("\n")[0];
+                    oldSchemaName = oldSchemaName.replaceAll("CREATE SCHEMA ", "");
+                    oldSchemaName = oldSchemaName.replaceAll(";", "").trim();
                     ddlQuery = ddlQuery.replaceAll(oldSchemaName, nameDataBaseField.getText());
                     dmlQuery = dmlQuery.replaceAll(oldSchemaName, nameDataBaseField.getText());
                 }
                 ddlReport.setText(ddlQuery);
                 dmlReport.setText(dmlQuery);
-                //dataRecovery(nameDataBaseField.getText(), ddlQuery, dmlQuery);
+                dataRecovery(nameDataBaseField.getText(), ddlQuery, dmlQuery);
                 nameDataBaseField.setText(DEFAULT_INPUT_TEXT);
             }
         });

@@ -9,39 +9,29 @@ public class ConnectionLibrary {
 
     private final static boolean DEFAULT_AUTO_COMMIT_OPTION = false;
     private final static String DEFAULT_CONNECT_REF = "jdbc:postgresql://localhost:5432";
-    private final static String DEFAULT_DATABASE_NAME = "";
 
     private static Connection c;
     private static Statement stmt;
 
-    private static void connectDataBase(String connectRef, boolean autoCommit) throws SQLException {
+    private static void connectDataBase(boolean autoCommit) throws SQLException {
         c = DriverManager
-                .getConnection(connectRef);
+                .getConnection(DEFAULT_CONNECT_REF);
         c.setAutoCommit(autoCommit);
     }
 
     /** connect to dataBase with default options */
     public static void creatConnection() {
         try {
-            connectDataBase(DEFAULT_CONNECT_REF, DEFAULT_AUTO_COMMIT_OPTION);
-        } catch (SQLException troubles) {
-            troubles.printStackTrace();
-        }
-    }
-
-    /** connect to database with input link reference */
-    public static void creatConnection(String connectRef) {
-        try {
-            connectDataBase(connectRef, DEFAULT_AUTO_COMMIT_OPTION);
+            connectDataBase(DEFAULT_AUTO_COMMIT_OPTION);
         } catch (SQLException troubles) {
             troubles.printStackTrace();
         }
     }
 
     /** connect to database with input options */
-    public static void creatConnection(String connectRef, boolean autoCommit) {
+    public static void creatConnection(boolean autoCommit) {
         try {
-            connectDataBase(connectRef, autoCommit);
+            connectDataBase(autoCommit);
         } catch (SQLException troubles) {
             troubles.printStackTrace();
         }
