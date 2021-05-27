@@ -13,6 +13,9 @@ public class ConnectionLibrary {
     private static Connection c;
     private static Statement stmt;
 
+    /** actual function to connect to database
+     * @param autoCommit option to choose auto commit
+     * @throws SQLException usual, when server isn't started */
     private static void connectDataBase(boolean autoCommit) throws SQLException {
         c = DriverManager
                 .getConnection(DEFAULT_CONNECT_REF);
@@ -28,7 +31,8 @@ public class ConnectionLibrary {
         }
     }
 
-    /** connect to database with input options */
+    /** connect to database with input options
+     * @param autoCommit option to choose auto commit */
     public static void creatConnection(boolean autoCommit) {
         try {
             connectDataBase(autoCommit);
@@ -37,6 +41,7 @@ public class ConnectionLibrary {
         }
     }
 
+    /** if exception was called, this function completes transaction */
     public static void continueCreatingInserting() {
         try {
             stmt.close();
@@ -47,7 +52,9 @@ public class ConnectionLibrary {
         }
     }
 
-    /** create table */
+    /** create table
+     * @param ddlQuery query type of editing model of database
+     * @throws SQLException usual, when previous transaction wasn't completed or table/relation/schema had been exists */
     public static void createTable(String ddlQuery) throws SQLException {
         stmt = c.createStatement();
         stmt.execute(ddlQuery);
@@ -55,7 +62,9 @@ public class ConnectionLibrary {
         c.commit();
     }
 
-    /** ADD NEW INFORMATION (that's it) */
+    /** add new information
+     * @param dmlQuery query type of editing data in the schema
+     * @throws SQLException when data is exists, out of this relation or other constraint */
     public static void insertRows(String dmlQuery) throws SQLException {
         stmt = c.createStatement();
         stmt.executeUpdate(dmlQuery);
@@ -63,7 +72,9 @@ public class ConnectionLibrary {
         c.commit();
     }
 
-    /** update information */
+    /** update information
+     * @param dmlQuery query type of editing data in the schema
+     * @throws SQLException when data is exists, out of this relation or other constraint */
     public static void updateDeleteRows(String dmlQuery) throws SQLException {
         stmt = c.createStatement();
         stmt.executeUpdate(dmlQuery);
@@ -71,7 +82,9 @@ public class ConnectionLibrary {
         stmt.close();
     }
 
-    /** show data from query */
+    /** show data from query
+     * @param selectQuery query what find in the schema
+     * @throws SQLException usual, when information schema isn't exists */
     public static JTable selectData(String selectQuery) throws SQLException {
         stmt = c.createStatement();
         ResultSet rs = stmt.executeQuery( selectQuery );
@@ -79,7 +92,7 @@ public class ConnectionLibrary {
         int columnsCount = rs.getMetaData().getColumnCount();
         String[] header = new String[columnsCount];
         for (int i = 1; i <= columnsCount; i++) {
-            header[i-1] = rs.getMetaData().getColumnName(i).toString();
+            header[i-1] = rs.getMetaData().getColumnName(i);
         }
 
         List<String[]> content = new ArrayList<>();
@@ -104,7 +117,8 @@ public class ConnectionLibrary {
         return new JTable(content.toArray(new String[content.size()][columnsCount]), header);
     }
 
-    /** close connection with database */
+    /** close connection with database
+     * @throws SQLException some process wasn't completed */
     public static void closeConnection() throws SQLException {
         c.close();
     }

@@ -6,12 +6,12 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serial;
 import java.sql.SQLException;
 
 public class Area4Inserting extends JFrame {
 
     private JPanel areaInsertPanel;
-    private static JFrame areaInserter;
     JButton button;
     Container container;
 
@@ -39,42 +39,16 @@ public class Area4Inserting extends JFrame {
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         container.add(label);
     }
-    /**
-     * Процедура создания интерфейса формы
-     * @param container контейнер
-     */
-    public void createUI(Container container) {
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-        addLabel("Хлеб"        , "Bread", container);
-        addLabel("Молоко"      , "Milk", container);
-        addLabel("Колбасы"     , "Butches", container);
-        addLabel("Мясо и птица", "Meals", container);
-        addLabel("Мороженные продукты", "IceCream", container);
-        JButton button = new JButton("перечислить");
-        container.add(button);
-    }
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public Area4Inserting(String selectedTable, String selectedSchema)
     {
-        super("Интерфейсы кнопок");
+        super("Fill this areas");
         setDefaultCloseOperation( EXIT_ON_CLOSE );
-        // Устанавливаем последовательное расположение
         container = getContentPane();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-        String loadKeysInfo = "SELECT information_schema.key_column_usage.constraint_name as constraint_name, information_schema.key_column_usage.table_name as source_table, information_schema.key_column_usage.column_name as column_name, information_schema.constraint_column_usage.table_name as referenced_table ";
-        loadKeysInfo += "FROM information_schema.key_column_usage, information_schema.constraint_column_usage ";
-        loadKeysInfo += "WHERE information_schema.constraint_column_usage.constraint_name = information_schema.key_column_usage.constraint_name ";
-        loadKeysInfo += "AND information_schema.key_column_usage.table_schema = '";
-        loadKeysInfo += selectedSchema + "' ";
-        loadKeysInfo += "GROUP BY information_schema.key_column_usage.constraint_name, information_schema.key_column_usage.table_name, information_schema.key_column_usage.column_name, information_schema.constraint_column_usage.table_name;";
-        JTable keys = null;
-        try {
-            keys = ConnectionLibrary.selectData(loadKeysInfo);
-        }
-        catch (SQLException troubles) {
-            troubles.printStackTrace();
-        }
+
         String loadTableInfo = "SELECT column_name ";
         loadTableInfo += "FROM information_schema.columns ";
         loadTableInfo += "WHERE table_catalog = 'postgres' ";
@@ -94,7 +68,7 @@ public class Area4Inserting extends JFrame {
             }
         }
 
-        button = new JButton("перечислить");
+        button = new JButton("insert data");
         button.addActionListener(new ListenerAction());
         button.addChangeListener(new ListenerChange());
         container.add(button);
@@ -121,5 +95,5 @@ public class Area4Inserting extends JFrame {
     }
     public static void mainMethod(String s, String sch) {
         new Area4Inserting(s, sch);
-    };
+    }
 }
